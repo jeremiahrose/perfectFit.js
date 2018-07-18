@@ -13,10 +13,7 @@ function perfectFit(textId, minWordSize){
             padding:0,
             margin: 0
         });
-        console.log(minWordSize);
         var text = tempElem.innerHTML; 
-        var debug = tempElem.cloneNode(true);
-        debug.innerHTML = text;
         var words = text.split(/\s+/);
         var totalWidth, width, height;
         [totalWidth, ] = textWidthHeight(text);
@@ -36,23 +33,19 @@ function perfectFit(textId, minWordSize){
             var debug = tempElem.cloneNode(true);
             document.body.appendChild(debug);
             debug.innerHTML = text;*/
-            console.log(minWordSize * width);/*
-            console.log(width);
-            console.log(height);
-            console.log(percentage);*/
-            return "<svg style='margin: 0 " + spacing * 2
-                           + "; min-width:" + minWordSize * width 
-                           + "; width:"+ width
-                           + "; flex-grow:" + percentage 
+            return "<svg style='margin: 0 " + Math.round(spacing * 2)
+                           + "; min-width:" + Math.round(minWordSize * width)
+                           + "px; flex-basis:"+ Math.round(width)
+                           + "px; flex-grow:" + Math.round(percentage)
+                           /*+ "; width:" + Math.round(percentage)*/
                            + "; height:100%;" 
-                           + "' viewBox='0 0 " + width + " " + height + "'>"
+                           + "' viewBox='0 0 " + Math.round(width) + " " + Math.round(height) + "'>"
                 + "<text id='"+textId+"' x='0' y='0' dominant-baseline='text-before-edge'>" + text 
                 +"</text></svg>"
         }
 
         function textWidthHeight(text){
             tempElem.innerHTML = text;
-            console.log(text);
             var width = tempElem.scrollWidth;
             var height = tempElem.scrollHeight;
             return [width, height];
