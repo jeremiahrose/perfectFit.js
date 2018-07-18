@@ -10,13 +10,13 @@ Features:
 - Tested on latest versions of Chromium and Firefox as of July 2018.
 
 Usage:
-<script src="perfectFit.js"></script>
+```<script src="perfectFit.js"></script>
 <div class="container">
     <div id="heading">A Long Expected Party</div>
 </div>
 <script>
     perfectFit("heading", "30px");
-</script>
+</script>```
 
 How it works:
 Behind the hood, perfectFit breaks your text into individual words and renders
@@ -33,6 +33,6 @@ help improving the compatibility and writing polyfills where necessary.
 * Cannot do hyphenated word-breaks (yet).
 
 * If using webfonts, perfectFit must be run after the fonts are loaded. 
-To this end, it uses the document.fonts.ready.then() handler, which 
+To this end, it uses the `document.fonts.ready.then()` handler, which 
 currently works on Chrome but not in Firefox. For Firefox you will have to
-manually ensure that your fonts are loaded before running perfectFit().
+manually ensure that your fonts are loaded before calling `perfectFit()`.
