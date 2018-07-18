@@ -10,13 +10,15 @@ Features:
 - Tested on latest versions of Chromium and Firefox as of July 2018.
 
 Usage:
-```<script src="perfectFit.js"></script>
+```
+<script src="perfectFit.js"></script>
 <div class="container">
     <div id="heading">A Long Expected Party</div>
 </div>
 <script>
     perfectFit("heading", "30px");
-</script>```
+</script>
+```
 
 How it works:
 Behind the hood, perfectFit breaks your text into individual words and renders
