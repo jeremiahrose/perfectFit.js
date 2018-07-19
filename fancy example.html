@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>        
+
+<meta name="viewport" content="width=device-width, maximum-scale=1.0, initial-scale = 1.0" />
+
+        
+<link href='https://fonts.googleapis.com/css?family=Alegreya' rel='stylesheet'>
+<script src="perfectFit.js"></script>
+<style>
+    body {
+        background-color:lightgrey;
+        margin: 0;
+    }
+    .container {
+        width:30%;
+        height:100vh;
+        margin: 0 auto;
+        animation: squeeze 30s infinite;
+        animation-fill-mode: forwards;
+        border-left: 1px dotted grey;
+        border-right: 1px dotted grey;
+    }
+    p {
+        text-align: justify;
+    }
+    @keyframes squeeze {
+      0% {
+        width: 100%;
+      }
+      50% {
+        width: 30%;
+      }
+      100% {
+        width: 100%;
+      }
+    }
+    #heading {font-family: serif}
+</style>
+</head>
+    
+<body>
+
+<div class="container">
+    <div id="heading">A Long Expected Party</div>
+    <p>Lorem ipsum dolor sit amet, ex est legere dictas, case molestie torquatos duo at. Et sed lorem deseruisse dissentiet, pri quem incorrupte persequeris ut. Elaboraret omittantur in mel, vis cu adhuc nostrum. Detracto voluptua tractatos eos ad, detraxit complectitur te cum, vivendo vivendum vim ad.
+Primis urbanitas sadipscing est cu. His quot blandit vituperata at, pri eu probatus quaestio necessitatibus, pro partem conceptam voluptatum ut. Amet meliore cum te, at vis elit praesent. Ad facer mnesarchum mel, ignota repudiare maiestatis eum ne.
+Sit at nullam explicari corrumpit, consulatu evertitur ad pro. Qui te wisi propriae appellantur, ex assum saepe mandamus usu. Eu vim tota choro. Ne convenire corrumpit vis, ferri placerat mel ne. Id vis error mundi accusam. Quo iudico recteque euripidis cu. Pro alii tollit fastidii ei.
+Laoreet hendrerit vis an, mei eu sale prima, mutat semper facete cu usu. Officiis lobortis dissentiunt cu mei, eam ea persius mnesarchum theophrastus. Nam movet discere cu, eligendi voluptaria ius an, purto legere intellegam ex ius. Usu minim tation ut. Sea laudem libris singulis at.
+Ei postea aliquam definitiones eam. Sit iudicabit definiebas in, in zril feugait pro. Nam cu vocibus epicurei, quo nihil dolores delicata ei, graece commune id cum. Facilisi perpetua referrentur ut sea, lorem nullam iuvaret an eos. At velit necessitatibus nam, per no dolorem voluptatibus. Luptatum imperdiet ullamcorper mei ad, est eu malis equidem comprehensam.
+</p>
+</div>
+<script>
+    perfectFit("heading", "50px");
+</script>
+</body>
+</html>
