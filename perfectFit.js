@@ -26,7 +26,7 @@ function perfectFit(textId, minFontSize="1em"){
         var spacing, spacing2;
         [spacing, ] = textWidthHeight("a a");
         [spacing2, ] = textWidthHeight("aa");
-        spacing = spacing - spacing2;
+        spacing = (spacing - spacing2)/2.0;
         // prepare to process individual words
         var svgs = "";
         var wordWidth, wordHeight;
@@ -52,12 +52,12 @@ function perfectFit(textId, minFontSize="1em"){
             padding:"initial",
             margin: "initial",
             fontSize: "initial",
-            marginLeft: "-" + spacing + "px",
-            marginRight: "-" + spacing + "px",
+            marginLeft: "-" + spacing / totalWidth * 100 + "%",
+            marginRight: "-" + spacing / totalWidth * 100 + "%"
         });
         
         function svgWord(text, width, height, percentage){
-            return "<svg style='margin: 0px " + spacing + "px; "
+            return "<svg style='margin: 0px " + spacing / totalWidth * 100 + "%; "
                              + "min-width:" + width + "px; "
                              + "flex-basis:"+ width + "px; "
                              + "flex-grow:" + percentage + "; "
