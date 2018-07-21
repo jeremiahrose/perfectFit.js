@@ -37,24 +37,28 @@ function perfectFit(textId, minFontSize="1em", fontFamily, verticalMargin="20px"
     Object.assign(elem.style, {
         display:"flex",
         flexWrap: "wrap",
-        alignItems: "center",
+        alignItems: "baseline",
         marginLeft: "-" + spacing+"px",
         marginRight: "-" + spacing+"px",
         //marginBottom: "-" + verticalMargin
     });
     
     function svgWord(text, width, height, descent, percentage, fontSize, fontFamily){
-        return "<svg style='margin-top: " + verticalMargin + "; "
-                         + "margin-left: "+spacing+"px; "
-                         + "margin-right: "+spacing+"px; "
-                         + "overflow: visible; "
-                         + "min-width:" + width + "px; "
-                         + "flex-basis:"+ width + "px; "
-                         + "flex-grow:" + percentage + "; "
-                         + "height:100%;" + "' "
-                         + "viewBox='0 0 " + width + " " + (height+descent) + "'>"
-        + "<text x='0' y='"+((height+descent)/2.0)+"' font-family='"+fontFamily+"' font-size='"+fontSize+"' dominant-baseline='central' >" + text 
-            +"</text></svg>"
+        return  "<div style='margin-top: " + verticalMargin + "; "
+                      + "margin-left: "+spacing+"px; "
+                      + "margin-right: "+spacing+"px; " // simulate whitespace between words
+                      + "line-height: 0; " // stops divs adding space between svgs
+                      + "min-width:" + width + "px; " // necessary???
+                      + "flex-basis:"+ width + "px; " // necessary???
+                      + "flex-grow:" + percentage + ";'>" // proportional to the length of the word :)
+                + "<svg viewBox='0 0 " + width + " " + (height-descent) + "' "
+                     + "style='width:100%; overflow:visible;' >" // first SVG is actual word
+                        + "<text x='0' y='"+(height-descent)+"' font-family='"+fontFamily+"' font-size='"+fontSize+"' dominant-baseline='baseline' >" + text 
+                        + "</text></svg>"
+                + "<svg viewBox='0 0 " + width + " " + descent + "' "  // second SVG fills out the height
+                     + "style='width:100%; background-color:blue; visibility:hidden;' >"
+                        + "</svg>"
+                + "</div>";
     }
 
     function getStringWidthHeight(text, fontSize, fontFamily) { // TODO just get text styles from DOM
