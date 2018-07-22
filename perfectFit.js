@@ -1,35 +1,42 @@
-function perfectFit(textId, minFontSize="1em", fontFamily, verticalMargin="20px"){
+function perfectFit(textId="", minFontSize="1em", verticalMargin="20px"){
     
-    var DEBUG = true;
+    var DEBUG = false;
     function debug(msg){
         if (DEBUG){ console.log(msg); }
     }   
     debug("Running perfectFit with DEBUG = true.");
-    debug("textId=" + textId + " fontFamily=" + fontFamily 
+    debug("textId=" + textId 
        + " minFontSize=" + minFontSize + " verticalMargin=" + verticalMargin);
-    // get heading and it's container
+    // get heading element
     var elem = document.getElementById(textId);
-    // save it's contents (should be text only)
+    // save its' contents (should be text only)
     var text = elem.innerHTML;
-    // split it's contents into words
+    // if there is no getComputedStyle, this library won't work.
+    if(!document.defaultView.getComputedStyle) {
+    throw("ERROR: 'document.defaultView.getComputedStyle' not found. This library only works in browsers that can report computed CSS values.");
+    }
+    // get its' styles
+    var styles = window.getComputedStyle(elem); // TODO in IE it is element.currentStyle
+    debug("font-family: " + styles['font-family']);
+    // split its' contents into words
     var words = text.split(/\s+/);
     // get rendered width of the whole text string 
     var totalWidth;
-    [totalWidth, , ] = getStringWidthHeight(text, minFontSize, fontFamily);
+    [totalWidth, , , ] = getStringWidthHeight(text, minFontSize, styles);
     // get the width of a space
     var spacing, spacing2;
-    [spacing, , ] = getStringWidthHeight("a o", minFontSize, fontFamily);
-    [spacing2, , ] = getStringWidthHeight("ao", minFontSize, fontFamily);
+    [spacing, , , ] = getStringWidthHeight("a o", minFontSize, styles);
+    [spacing2, , , ] = getStringWidthHeight("ao", minFontSize, styles);
     spacing = (spacing - spacing2)/2.0;
     debug("spacing: ", spacing);
     // prepare to process individual words
     var svgs = "";
-    var wordWidth, wordHeight;
+    var wordWidth, wordHeight, wordDescent, wordXOffset;
     for (var word of words){ 
         // Get the metrics of each word
-        [wordWidth, wordHeight, wordDescent] = getStringWidthHeight(word, minFontSize, fontFamily);
+        [wordWidth, wordHeight, wordDescent, wordXOffset] = getStringWidthHeight(word, minFontSize, styles);
         // create an SVG for each word
-        svgs += svgWord(word, wordWidth, wordHeight, wordDescent, wordWidth/totalWidth * 100, minFontSize, fontFamily);
+        svgs += svgWord(word, wordWidth, wordHeight, wordDescent, wordXOffset, wordWidth/totalWidth * 100, minFontSize, styles);
     }
     // replace elem's contents with svgs
     elem.innerHTML = svgs;
@@ -43,7 +50,9 @@ function perfectFit(textId, minFontSize="1em", fontFamily, verticalMargin="20px"
         //marginBottom: "-" + verticalMargin
     });
     
-    function svgWord(text, width, height, descent, percentage, fontSize, fontFamily){
+    function svgWord(text, width, height, descent, xOffset, percentage, fontSize, cssStyles){
+        var fontFamily = cssStyles["font-family"];//styles.getPropertyValue(property);
+        var fontWeight = cssStyles["font-weight"];
         return  "<div style='margin-top: " + verticalMargin + "; "
                       + "margin-left: "+spacing+"px; "
                       + "margin-right: "+spacing+"px; " // simulate whitespace between words
@@ -52,8 +61,8 @@ function perfectFit(textId, minFontSize="1em", fontFamily, verticalMargin="20px"
                       + "flex-basis:"+ width + "px; " // necessary???
                       + "flex-grow:" + percentage + ";'>" // proportional to the length of the word :)
                 + "<svg viewBox='0 0 " + width + " " + (height-descent) + "' "
-                     + "style='width:100%; overflow:visible;' >" // first SVG is actual word
-                        + "<text x='0' y='"+(height-descent)+"' font-family='"+fontFamily+"' font-size='"+fontSize+"' dominant-baseline='baseline' >" + text 
+                     + "style='width:100%; overflow:visible;' >" // first SVG is actual word font-weight='"+fontWeight+"' font-family='"+fontFamily+"' 
+                        + "<text x='-"+xOffset+"' y='"+(height-descent)+"' font-size='"+fontSize+"' dominant-baseline='baseline' >" + text 
                         + "</text></svg>"
                 + "<svg viewBox='0 0 " + width + " " + descent + "' "  // second SVG fills out the height
                      + "style='width:100%; background-color:blue; visibility:hidden;' >"
@@ -61,7 +70,7 @@ function perfectFit(textId, minFontSize="1em", fontFamily, verticalMargin="20px"
                 + "</div>";
     }
 
-    function getStringWidthHeight(text, fontSize, fontFamily) { // TODO just get text styles from DOM
+    function getStringWidthHeight(text, fontSize, cssStyles) { // TODO just get text styles from DOM
         var width, height;
         // This is tricky. There are a few methods we can use, in fallback order:
         // 1. Use canvas context.measureText(). This is not supported by any browsers but will be eventually.
@@ -69,8 +78,9 @@ function perfectFit(textId, minFontSize="1em", fontFamily, verticalMargin="20px"
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext("2d");
         if (typeof(ctx) != 'undefined'){ // we have canvas
-            ctx.font = fontSize + " " + fontFamily;
+            ctx.font = cssStyles['font-style'] + " " + cssStyles['font-weight'] + " " + fontSize + " " + cssStyles['font-family'];
             debug("font: " + ctx.font);
+            debug("font-family: " + ctx.fontFamily);
             var metrics = ctx.measureText(text);
             var height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
             var descent = metrics.actualBoundingBoxDescent;
@@ -89,8 +99,10 @@ function perfectFit(textId, minFontSize="1em", fontFamily, verticalMargin="20px"
             fontSizePx = fontSize.replace("px","");
             canvas.height = 3 * fontSizePx;
             canvas.style.opacity = 1;
-            ctx.font = fontSize + " " + fontFamily; // Apparently we have to set this again??
+            // apparently we have to set this again??
+            ctx.font = cssStyles['font-style'] + " " + cssStyles['font-weight'] + " " + fontSize + " " + cssStyles['font-family'];
             debug("font: " + ctx.font);
+            debug("font-family: " + ctx.fontFamily);
 
             var w = canvas.width,
                 h = canvas.height,
@@ -119,31 +131,49 @@ function perfectFit(textId, minFontSize="1em", fontFamily, verticalMargin="20px"
             while (--i > 0 && pixelData[i] === 255) {}
             var desc = (i/w4)|0;
 
-            // find the min-x coordinate
-            /*for(i = 0; i<len && pixelData[i] === 255; ) {
-              i += w4;
-              if(i>=len) { i = (i-len) + 4; }}
-            var minx = ((i%w4)/4) | 0;*/
+            if (true){
+                // find the min-x coordinate
+                for(i = 0; i<len && pixelData[i] === 255; ) {
+                  i += w4;
+                  if(i>=len) { i = (i-len) + 4; }}
+                var minx = ((i%w4)/4) | 0;
 
-            // find the max-x coordinate
-            /*var step = 1;
-            for(i = len-3; i>=0 && pixelData[i] === 255; ) {
-              i -= w4;
-              if(i<0) { i = (len - 3) - (step++)*4; }}
-            var maxx = ((i%w4)/4) + 1 | 0;*/
+                // find the max-x coordinate
+                var step = 1;
+                for(i = len-3; i>=0 && pixelData[i] === 255; ) {
+                  i -= w4;
+                  if(i<0) { i = (len - 3) - (step++)*4; }}
+                var maxx = ((i%w4)/4) + 1 | 0;
+            }
 
             // set font metrics
             var ascent = (baseline - asc);
             var descent = 1+(desc - baseline);
             var height = 1+(desc - asc);
-            // var width = maxx - minx;
-            // Don't use manually scanned width - it takes away all glyph
-            // padding and so will be different to the rendering in the SVG
+            var width = maxx - minx;
+            var xOffset = minx - padding/2;
             
             debug("scanned pixel by pixel: " + text);
             debug("width: " + width + " height: " + height+ " descent: " + descent);
+            debug("xOffset: " + (minx - padding/2));
             debug("-----------------------------------------");
-            return [width, height, descent];
+            
+            if (DEBUG){ // show canvas and calculated bounds
+                ctx.strokeStyle = "red";
+                ctx.beginPath();
+                ctx.moveTo(minx,baseline+descent);
+                ctx.lineTo(minx+width,baseline+descent);
+                ctx.lineTo(minx+width,baseline-ascent);
+                ctx.lineTo(minx,baseline-ascent);
+                ctx.lineTo(minx,baseline+descent);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(padding/2,0);
+                ctx.lineTo(padding/2,3 * fontSizePx);
+                ctx.stroke();
+                document.body.appendChild(canvas);
+                }
+            return [width, height, descent, xOffset];
         
         }
         // 3. If canvas isn't supported at all, use element.scrollWidth and scrollHeight.
@@ -174,6 +204,11 @@ function perfectFit(textId, minFontSize="1em", fontFamily, verticalMargin="20px"
         document.body.removeChild(e);
         debug("using scrollWidth/Height for: " + text);
         debug("width: " + width + " height: " + height+ " descent: " + descent);
-        return [width, height, descent];    
+        return [width, height, descent, xoffset];    
     } 
+
+    // shortcut function for getting computed CSS values
+    var getCSSValue = function(element, property) {
+        return document.defaultView.getComputedStyle(element,null).getPropertyValue(property);
+      };
 }
