@@ -1,6 +1,5 @@
-function perfectFit(textId="", minFontSize="1em", verticalMargin="20px"){
+function perfectFit(textId="", minFontSize="1em", verticalMargin="20px", DEBUG=false){
     
-    var DEBUG = false;
     function debug(msg){
         if (DEBUG){ console.log(msg); }
     }   
@@ -62,7 +61,7 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px"){
                       + "flex-grow:" + percentage + ";'>" // proportional to the length of the word :)
                 + "<svg viewBox='0 0 " + width + " " + (height-descent) + "' "
                      + "style='width:100%; overflow:visible;' >" // first SVG is actual word font-weight='"+fontWeight+"' font-family='"+fontFamily+"' 
-                        + "<text x='-"+xOffset+"' y='"+(height-descent)+"' font-size='"+fontSize+"' dominant-baseline='baseline' >" + text 
+                        + "<text x='"+(-xOffset)+"' y='"+(height-descent)+"' font-size='"+fontSize+"' dominant-baseline='baseline' >" + text 
                         + "</text></svg>"
                 + "<svg viewBox='0 0 " + width + " " + descent + "' "  // second SVG fills out the height
                      + "style='width:100%; background-color:blue; visibility:hidden;' >"
@@ -77,10 +76,12 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px"){
         // https://html.spec.whatwg.org/dev/canvas.html#drawing-text-to-the-bitmap
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext("2d");
+        if (DEBUG){
+            document.body.appendChild(canvas);
+        }
         if (typeof(ctx) != 'undefined'){ // we have canvas
             ctx.font = cssStyles['font-style'] + " " + cssStyles['font-weight'] + " " + fontSize + " " + cssStyles['font-family'];
             debug("font: " + ctx.font);
-            debug("font-family: " + ctx.fontFamily);
             var metrics = ctx.measureText(text);
             var height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
             var descent = metrics.actualBoundingBoxDescent;
@@ -102,7 +103,6 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px"){
             // apparently we have to set this again??
             ctx.font = cssStyles['font-style'] + " " + cssStyles['font-weight'] + " " + fontSize + " " + cssStyles['font-family'];
             debug("font: " + ctx.font);
-            debug("font-family: " + ctx.fontFamily);
 
             var w = canvas.width,
                 h = canvas.height,
@@ -158,7 +158,7 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px"){
             debug("xOffset: " + (minx - padding/2));
             debug("-----------------------------------------");
             
-            if (DEBUG){ // show canvas and calculated bounds
+            if (DEBUG){ // show bounds
                 ctx.strokeStyle = "red";
                 ctx.beginPath();
                 ctx.moveTo(minx,baseline+descent);
@@ -171,7 +171,6 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px"){
                 ctx.moveTo(padding/2,0);
                 ctx.lineTo(padding/2,3 * fontSizePx);
                 ctx.stroke();
-                document.body.appendChild(canvas);
                 }
             return [width, height, descent, xOffset];
         
