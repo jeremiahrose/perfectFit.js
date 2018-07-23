@@ -19,30 +19,38 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px", DEBUG=f
     debug("font-family: " + styles['font-family']);
     // split its' contents into words
     var words = text.split(/\s+/);
-    // get rendered width of the whole text string 
-    var totalWidth;
-    [totalWidth, , , ] = getStringWidthHeight(text, minFontSize, styles);
-    // get the width of a space
-    var spacing, spacing2;
-    [spacing, , , ] = getStringWidthHeight("a o", minFontSize, styles);
-    [spacing2, , , ] = getStringWidthHeight("ao", minFontSize, styles);
-    spacing = (spacing - spacing2)/2.0;
-    debug("spacing: ", spacing);
-    
     // prepare to process individual words
     var wordSpacingPercent = 0.5; // arbitrary
     var wordSpacingPixels = 5; // arbitrary
     var dadWidthPercent = 100 + 2 * wordSpacingPercent;
     var dadMargin = -wordSpacingPercent;
     var babyMargin = 1 / (1/wordSpacingPercent + 2/100);
-        
+    // get styles
+    var fontFamily = styles["font-family"];//styles.getPropertyValue(property);
+    var fontWeight = styles["font-weight"];
+    // prepare for iteratiion
     var svgs = "";
     var wordWidth, wordHeight, wordDescent, wordXOffset;
     for (var word of words){ 
         // Get the metrics of each word
         [wordWidth, wordHeight, wordDescent, wordXOffset] = getStringWidthHeight(word, minFontSize, styles);
         // create an SVG for each word
-        svgs += svgWord(word, wordWidth, wordHeight, wordDescent, wordXOffset, wordWidth/totalWidth * 100, minFontSize, styles);
+        
+        svgs += "<div style='margin-top: " + verticalMargin + "; "
+                      + "margin-left: calc(" + babyMargin + "% + " + wordSpacingPixels + "px); "
+                      + "margin-right: calc(" + babyMargin + "% + " + wordSpacingPixels + "px); "
+                      + "line-height: 0; " // stops divs adding space between svgs
+                      + "min-width:" + wordWidth + "px; " // necessary???
+                      + "flex-basis:"+ wordWidth + "px; " // necessary???
+                      + "flex-grow:" + wordWidth + ";'>" // proportional to the length of the word :)
+                + "<svg viewBox='0 0 " + wordWidth + " " + (wordHeight-wordDescent) + "' "
+                     + "style='width:100%; overflow:visible;' >" // first SVG is actual word font-weight='"+fontWeight+"' font-family='"+fontFamily+"' 
+                        + "<text x='"+(-wordXOffset)+"' y='"+(wordHeight-wordDescent)+"' font-size='"+minFontSize+"' font-weight='"+fontWeight+"' dominant-baseline='baseline' >" + word 
+                        + "</text></svg>"
+                + (wordDescent>0 ? "<svg viewBox='0 0 " + wordWidth + " " + wordDescent + "' "  // second SVG fills out the height
+                     + "style='width:100%; background-color:blue; visibility:hidden;' >"
+                        + "</svg>" : "")
+                + "</div>";
     }
     // replace elem's contents with svgs
     elem.innerHTML = svgs;
@@ -57,27 +65,6 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px", DEBUG=f
         //marginBottom: "-" + verticalMargin
     });
     
-    function svgWord(text, width, height, descent, xOffset, percentage, fontSize, cssStyles){
-        var fontFamily = cssStyles["font-family"];//styles.getPropertyValue(property);
-        var fontWeight = cssStyles["font-weight"];
-        
-        return  "<div style='margin-top: " + verticalMargin + "; "
-                      + "margin-left: calc(" + babyMargin + "% + " + wordSpacingPixels + "px); "
-                      + "margin-right: calc(" + babyMargin + "% + " + wordSpacingPixels + "px); "
-                      + "line-height: 0; " // stops divs adding space between svgs
-                      + "min-width:" + width + "px; " // necessary???
-                      + "flex-basis:"+ width + "px; " // necessary???
-                      + "flex-grow:" + percentage + ";'>" // proportional to the length of the word :)
-                + "<svg viewBox='0 0 " + width + " " + (height-descent) + "' "
-                     + "style='width:100%; overflow:visible;' >" // first SVG is actual word font-weight='"+fontWeight+"' font-family='"+fontFamily+"' 
-                        + "<text x='"+(-xOffset)+"' y='"+(height-descent)+"' font-size='"+fontSize+"' font-weight='"+fontWeight+"' dominant-baseline='baseline' >" + text 
-                        + "</text></svg>"
-                + (descent>0 ? "<svg viewBox='0 0 " + width + " " + descent + "' "  // second SVG fills out the height
-                     + "style='width:100%; background-color:blue; visibility:hidden;' >"
-                        + "</svg>" : "")
-                + "</div>";
-    }
-
     function getStringWidthHeight(text, fontSize, cssStyles) { // TODO just get text styles from DOM
         var width, height;
         // This is tricky. There are a few methods we can use, in fallback order:
