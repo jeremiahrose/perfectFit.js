@@ -41,6 +41,10 @@ Usage:
 </script>
 ```
 
+Example using webfonts:
+
+https://css-tricks.com/loading-web-fonts-with-the-web-font-loader/
+
 How it works:
 
 Behind the hood, perfectFit breaks your text into individual words and renders
