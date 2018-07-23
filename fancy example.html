@@ -6,7 +6,6 @@
 
 <script src="perfectFit.js"></script>
 
-    
 </script>
 
 <style>
@@ -17,6 +16,14 @@
         font-family: serif;
         animation: fadein 0.8s;
     }
+    
+    #heading {
+        color: brown;
+        margin-top: 0px;
+        text-transform: capitalize;
+        text-shadow: 2px 2px 2px black;
+        /*letter-spacing: 5px;*/
+        }
 
     @keyframes fadein {
         from { opacity: 0; }
@@ -48,15 +55,13 @@
       }
     }
     
-    .heading text{fill:brown; text-decoration: underline;}
-    
 </style>
 </head>
     
 <body>
 
 <div class="container">
-    <div id="heading">Once there was a Bear</div>
+    <h1 id="heading">Once upon a time there were three bears</h1>
     <p>Once upon a time there were three bears who lived in a house in the forest. Therewas a great big father bear, a middle-sized mother bear and a tiny baby bear.
 One morning, their breakfast porridge was too hot to eat, so they decided to go for a walk in the forest. While they were out, a little girl called Goldilocks came through the trees and found their house. She knocked on the door and, as there was no answer, she pushed it open and went inside.
 In front of her was a table with three chairs, one large chair, one middle-sized chair and one small chair. On the table were three bowls of porridge, one large bowl, one middle-sized bowl and one small bowl – and three spoons.
@@ -70,8 +75,7 @@ In a little while, the three bears came back from their walk in the forest. They
 </div>
 
 <script>
-    //perfectFit("heading", minFontSize="60px", verticalMargin="5px", DEBUG=true);
-perfectFit("heading", minFontSize="30px", verticalMargin="7px", DEBUG=true);
+    perfectFit("heading", minFontSize="30px", verticalSpacing="7px", DEBUG=true);
 </script>
 </body>
 </html>

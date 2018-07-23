@@ -1,11 +1,11 @@
-function perfectFit(textId="", minFontSize="1em", verticalMargin="20px", DEBUG=false){
+function perfectFit(textId="", minFontSize="1em", verticalSpacing="20px", DEBUG=false){
     
     function debug(msg){
         if (DEBUG){ console.log(msg); }
     }   
     debug("Running perfectFit with DEBUG = true.");
     debug("textId=" + textId 
-       + " minFontSize=" + minFontSize + " verticalMargin=" + verticalMargin);
+       + " minFontSize=" + minFontSize + " verticalSpacing=" + verticalSpacing);
     // get heading element
     var elem = document.getElementById(textId);
     // save its' contents (should be text only)
@@ -22,12 +22,15 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px", DEBUG=f
     // prepare to process individual words
     var wordSpacingPercent = 0.5; // arbitrary
     var wordSpacingPixels = 5; // arbitrary
-    var dadWidthPercent = 100 + 2 * wordSpacingPercent;
-    var dadMargin = -wordSpacingPercent;
-    var babyMargin = 1 / (1/wordSpacingPercent + 2/100);
+    var outerWidth = 100 + 2 * wordSpacingPercent;
+    var negativeMargin = -wordSpacingPercent;
+    var wordMargin = 1 / (1/wordSpacingPercent + 2/100);
     // get styles
     var fontFamily = styles["font-family"];//styles.getPropertyValue(property);
     var fontWeight = styles["font-weight"];
+    var textColor = styles["color"];
+    var textDecoration = styles["text-decoration"]; // this isn't inherited?
+    //var textShadow = styles["text-shadow"]; // this is inherited
     // prepare for iteratiion
     var svgs = "";
     var wordWidth, wordHeight, wordDescent, wordXOffset;
@@ -35,17 +38,16 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px", DEBUG=f
         // Get the metrics of each word
         [wordWidth, wordHeight, wordDescent, wordXOffset] = getStringWidthHeight(word, minFontSize, styles);
         // create an SVG for each word
-        
-        svgs += "<div style='margin-top: " + verticalMargin + "; "
-                      + "margin-left: calc(" + babyMargin + "% + " + wordSpacingPixels + "px); "
-                      + "margin-right: calc(" + babyMargin + "% + " + wordSpacingPixels + "px); "
+        svgs += "<div style='margin-top: " + verticalSpacing + "; "
+                      + "margin-left: calc(" + wordMargin + "% + " + wordSpacingPixels + "px); "
+                      + "margin-right: calc(" + wordMargin + "% + " + wordSpacingPixels + "px); "
                       + "line-height: 0; " // stops divs adding space between svgs
                       + "min-width:" + wordWidth + "px; " // necessary???
                       + "flex-basis:"+ wordWidth + "px; " // necessary???
                       + "flex-grow:" + wordWidth + ";'>" // proportional to the length of the word :)
                 + "<svg viewBox='0 0 " + wordWidth + " " + (wordHeight-wordDescent) + "' "
                      + "style='width:100%; overflow:visible;' >" // first SVG is actual word font-weight='"+fontWeight+"' font-family='"+fontFamily+"' 
-                        + "<text x='"+(-wordXOffset)+"' y='"+(wordHeight-wordDescent)+"' font-size='"+minFontSize+"' font-weight='"+fontWeight+"' dominant-baseline='baseline' >" + word 
+                        + "<text x='"+(-wordXOffset)+"' y='"+(wordHeight-wordDescent)+"' font-size='"+minFontSize+"' font-weight='"+fontWeight+"' fill='"+textColor+"' text-decoration='"+textDecoration+"' dominant-baseline='baseline' >" + word 
                         + "</text></svg>"
                 + (wordDescent>0 ? "<svg viewBox='0 0 " + wordWidth + " " + wordDescent + "' "  // second SVG fills out the height
                      + "style='width:100%; background-color:blue; visibility:hidden;' >"
@@ -59,10 +61,10 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px", DEBUG=f
         display:"flex",
         flexWrap: "wrap",
         alignItems: "baseline",
-        width: "calc(" + dadWidthPercent + "% + " + wordSpacingPixels * 2 + "px)",
-        marginLeft: "calc(" + dadMargin + "% - " + wordSpacingPixels + "px)",
-        marginRight: "calc(" + dadMargin + "% - " + wordSpacingPixels + "px)",
-        //marginBottom: "-" + verticalMargin
+        width: "calc(" + outerWidth + "% + " + wordSpacingPixels * 2 + "px)",
+        marginLeft: "calc(" + negativeMargin + "% - " + wordSpacingPixels + "px)",
+        marginRight: "calc(" + negativeMargin + "% - " + wordSpacingPixels + "px)",
+        //marginBottom: "-" + verticalSpacing
     });
     
     function getStringWidthHeight(text, fontSize, cssStyles) { // TODO just get text styles from DOM
@@ -72,6 +74,17 @@ function perfectFit(textId="", minFontSize="1em", verticalMargin="20px", DEBUG=f
         // https://html.spec.whatwg.org/dev/canvas.html#drawing-text-to-the-bitmap
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext("2d");
+        switch (cssStyles['text-transform']){
+            case "uppercase":
+                text = text.toUpperCase();
+                break;
+            case "lowercase":
+                text = text.toLowerCase();
+                break;
+            case "capitalize":
+                text = text.replace(/(?:^|\s)\S/g, function(a){return a.toUpperCase(); });
+                break;
+        }
         if (DEBUG){
             document.body.appendChild(canvas);
         }

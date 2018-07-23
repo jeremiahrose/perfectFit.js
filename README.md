@@ -7,21 +7,22 @@ Features:
 - Tiny (~4kB minified).
 - No event handlers. Runs once on page load, then lets CSS do the rest. 
 - Options for minimum font size and vertical spacing.
-- Works with webfonts
+- Works with webfonts, text styles, shadows, transforms
 - Fully selectable text.
 - Tested on latest versions of Chromium and Firefox as of July 2018.
 
 Downsides:
 - It changes the markup so might not be suitable for screen readers
 - Not yet tested in a variety of browsers (please help!)
+- Doesn't work well with underlined text (there will be gaps between the words)
 
 Under construction:
 - Option to disable text wrapping
-- Correctly dealing with text styles and decoration
-- Correctly dealing with delayed loading of webfonts
+- Correct handling of non-default letter-spacing
 - Compatibility with older browsers and IE
 - More exact handling of horizontal space
 - Fancy github demo page
+- Webfont loading example
 
 Usage:
 ```
@@ -29,21 +30,24 @@ Usage:
 
 <style>
     .container {width: 50%;}
-    #heading {font-family: "Times New Roman";}
+    h1 {font-family: "Times New Roman", Times, serif;}
 </style>
 
 <div class="container">
-    <div id="heading">A Long Expected Party</div>
+    <h1 id="heading">A Long Expected Party</h1>
 </div>
 
 <script>
-    perfectFit("heading", minFontSize="30px", verticalMargin="8px");
+    perfectFit("heading", minFontSize="30px", verticalSpacing="8px");
 </script>
 ```
 
-Example using webfonts:
+A note about webfonts:
 
-https://css-tricks.com/loading-web-fonts-with-the-web-font-loader/
+It is your responsibility to make sure your font is loaded and rendered in the 
+browser before running perfectFit(), otherwise your text will not scale
+correctly. The Google Web Font Loader will help you out with this:
+https://github.com/typekit/webfontloader
 
 How it works:
 
