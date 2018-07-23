@@ -7,7 +7,7 @@ Features:
 - Tiny (~4kB minified).
 - No event handlers. Runs once on page load, then lets CSS do the rest. 
 - Options for minimum font size and vertical spacing.
-- Works with webfonts, text styles, shadows, transforms
+- Works with webfonts, text styles, shadows, transforms, and animations.
 - Fully selectable text.
 - Tested on latest versions of Chromium and Firefox as of July 2018.
 
