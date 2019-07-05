@@ -3,7 +3,7 @@ Make headings fit their divs perfectly.
 
 Features:
 - The ONLY text fitting library that properly scales wrapped text.
-- Fits text to the exact size of a div, to the pixel, responsively.
+- Fits text to the exact size of a div, responsively.
 - Tiny (~4kB minified).
 - No event handlers. Runs once on page load, then lets CSS do the rest. 
 - Options for minimum font size and vertical spacing.
@@ -15,6 +15,7 @@ Downsides:
 - It changes the markup so might not be suitable for screen readers
 - Not yet tested in a variety of browsers (please help!)
 - Doesn't work well with underlined text (there will be gaps between the words)
+- The spacing between words is not scaled in the same way as the words themselves. This can lead to slightly wonky spacing, sometimes. However, it usually looks pretty good.
 
 Under construction:
 - Option to disable text wrapping
